@@ -1,21 +1,31 @@
 package com.example.missyou.api.v1;
 
-import com.example.missyou.dto.PersonDTO;
-import org.hibernate.validator.constraints.Range;
+import com.example.missyou.exception.http.NotFoundException;
+import com.example.missyou.model.BannerEntity;
+import com.example.missyou.service.BannerService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/banner")
 @Validated
 public class BannerController {
 
-    @PostMapping("/test/{id}")
-    public PersonDTO test(@PathVariable(name = "id") @Range(min = 1,max = 10,message = "1-10之间") Integer id,
-                          @RequestParam String name,
-                          @RequestBody @Validated PersonDTO person) {
+    @Autowired
+    private BannerService bannerService;
 
-//        PersonDTO personDTO2 = new PersonDTO("echo");
-        return person;
+    @GetMapping("/name/{name}")
+    public BannerEntity getByName(@PathVariable String name){
+        BannerEntity bannerEntity = bannerService.getByName(name);
+        if (bannerEntity==null){
+            throw new NotFoundException(30005);
+        }
+        return bannerService.getByName(name);
     }
+
+
 }

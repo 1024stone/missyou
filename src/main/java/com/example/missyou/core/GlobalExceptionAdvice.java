@@ -2,6 +2,7 @@ package com.example.missyou.core;
 
 import com.example.missyou.core.configuration.ExceptionCodeConfiguration;
 import com.example.missyou.exception.http.HttpException;
+import com.example.missyou.exception.http.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -37,6 +38,16 @@ public class GlobalExceptionAdvice {
 
     @ExceptionHandler(value = HttpException.class)
     public ResponseEntity<UnifyResponse> handleHttpException(HttpServletRequest req,HttpException e){
+        UnifyResponse message =
+                new UnifyResponse(e.getCode(),codeConfiguration.getMessage(e.getCode()),req.getMethod()+" "+ req.getRequestURI());
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpStatus httpStatus = HttpStatus.resolve(e.getHttpStatusCode());
+        ResponseEntity<UnifyResponse> r = new ResponseEntity<>(message,headers,httpStatus);
+        return r;
+    }
+    @ExceptionHandler(value = NotFoundException.class)
+    public ResponseEntity<UnifyResponse> handleNotFoundException(HttpServletRequest req,NotFoundException e){
         UnifyResponse message =
                 new UnifyResponse(e.getCode(),codeConfiguration.getMessage(e.getCode()),req.getMethod()+" "+ req.getRequestURI());
         HttpHeaders headers = new HttpHeaders();
